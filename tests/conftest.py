@@ -1,6 +1,5 @@
 #aqui van a estar todos los fixtures, se definen
 from time import sleep
-
 import pytest
 from utils_movies import create_driver
 
