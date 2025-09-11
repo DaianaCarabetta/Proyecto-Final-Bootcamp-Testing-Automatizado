@@ -29,3 +29,5 @@ Feature: Listado de Especiales
     Given la respuesta del backend no contiene especiales
     Then debería mostrarse el mensaje "No hay especiales disponibles"
     And no deberían mostrarse tarjetas vacías ni errores visibles
+
+
