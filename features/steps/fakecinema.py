@@ -282,11 +282,11 @@ def step_then_cart_shows_popcorn(context):
 # Feature: Límite en la cantidad de productos
 # ---
 
-@given('que el usuario está en la sección de alimentos')
-def step_given_user_is_on_food_section(context):
-    """Given que el usuario está en la sección de alimentos"""
+#@given('que el usuario está en la sección de alimentos')
+#def step_given_user_is_on_food_section(context):
+#    """Given que el usuario está en la sección de alimentos"""
     # Lógica para ir a la sección de alimentos
-    pass
+ #   pass
 
 @when('agrega {quantity:d} unidades de "{item_name}" al carrito')
 def step_when_adds_quantity_of_item(context, quantity, item_name):
