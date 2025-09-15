@@ -14,6 +14,7 @@ class BasePage:
         self.driver.find_element(*locator).click()
 
     def type(self, locator: tuple[By, str], text: str):
+        element = self.driver.find_element(*locator)
         element.clear()
         element.send_keys(text)
 
