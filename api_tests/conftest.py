@@ -23,3 +23,35 @@ class API:
 def api() -> API:
     assert BASE_URL, "Falta BASE_URL en .env"
     return API(BASE_URL)
+
+# --- agregar en api_tests/conftest.py ---
+
+import uuid
+
+def random_email(domain="example.com")->str:
+    return f"usr-{uuid.uuid4().hex[:8]}@{domain}"
+
+@pytest.fixture(scope="session")
+def admin_creds():
+    return {
+        "username": os.getenv("ADMIN_USER", "admin@demo.com"),
+        "password": os.getenv("ADMIN_PASS", "admin123"),
+    }
+
+@pytest.fixture(scope="session")
+def token(api, admin_creds)->str:
+    # OAuth2 password flow
+    r = api.post("/auth/login", data=admin_creds)
+    assert r.status_code == 200, f"Login falló: {r.status_code} {r.text}"
+    body = r.json()
+    assert body.get("access_token") and body.get("token_type") == "bearer"
+    return body["access_token"]
+
+@pytest.fixture
+def api_auth(token):
+    # API client con Bearer token
+    class APIAuth(type(api())):  # reutiliza la clase API de tu conftest
+        pass
+    client = api()
+    client.s.headers.update({"Authorization": f"Bearer {token}"})
+    return client
