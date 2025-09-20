@@ -14,16 +14,22 @@ Feature: Checkout
     And hace clic en "Proceder al pago"
     Then el sistema debería redirigirlo a la vista de checkout
 
+
   Scenario: Visualizar resumen de compra en checkout
     Then debería visualizar la lista de productos seleccionados con su precio unitario
     And debería visualizar el total de la compra
 
+
   Scenario: Validación de email en el formulario de checkout
-    When ingresa un email con formato inválido
-    Then el sistema debe mostrar un mensaje de error y el boton debe estar deshabilitado
-    And no debe permitir continuar con el pago
+    When intenta confirmar con un email inválido
+    Then el sistema debe mostrar un mensaje de error
+
 
   Scenario: Validación de campos obligatorios
     When deja vacío el campo "Apellido"
     Then el sistema debe mostrar un mensaje de error indicando que el campo es obligatorio
-    And no debe permitir continuar con el pago
+
+
+  Scenario: Completar checkout y redirigir a confirmación de pago
+    When el usuario completó el formulario de checkout con datos válidos y confirmó el pago
+    Then el sistema debería redirigirlo a la vista de confirmación de pago

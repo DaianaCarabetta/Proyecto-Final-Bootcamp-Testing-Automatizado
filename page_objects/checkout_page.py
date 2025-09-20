@@ -1,14 +1,15 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 
 class CheckoutPage:
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(driver, 5)
+        self.wait = WebDriverWait(driver, 10)
 
-    # ---------- SELECTORES ----------
+
     TITLE = (By.XPATH, "//h1[text()='Checkout']")
     PRODUCT_LIST = (By.CSS_SELECTOR, "main div.flex.justify-between.border-b")
     TOTAL = (By.CSS_SELECTOR, "div.flex.justify-between.font-bold span:last-child")
@@ -22,59 +23,65 @@ class CheckoutPage:
     INPUT_CARDNUMBER = (By.ID, "cardNumber")
     INPUT_CVV = (By.ID, "cvv")
 
-    # ---------- MÉTODOS ----------
+
     def is_loaded(self):
         """Verifica que estemos en Checkout"""
-        return self.wait.until(EC.presence_of_element_located(self.TITLE))
+        try:
+            self.wait.until(EC.presence_of_element_located(self.TITLE))
+            return True
+        except TimeoutException:
+            return False
 
     def is_item_displayed(self, nombre_producto, precio):
         """Verifica que un producto con precio aparezca en el resumen"""
+        self.wait.until(EC.presence_of_all_elements_located(self.PRODUCT_LIST))
         productos = self.driver.find_elements(*self.PRODUCT_LIST)
         for producto in productos:
-            spans = producto.find_elements(By.TAG_NAME, "span")
-            if spans and nombre_producto in spans[0].text and precio in spans[1].text:
+            texto = producto.text
+            if nombre_producto in texto and precio in texto:
                 return True
         return False
 
     def get_total(self):
         """Obtiene el total de la compra"""
-        return self.driver.find_element(*self.TOTAL).text
+        return self.wait.until(EC.presence_of_element_located(self.TOTAL)).text
 
     def fill_form(self, nombre, apellido, email, card_name, card_number, cvv):
         """Completa el formulario con los datos dados"""
-        self.driver.find_element(*self.INPUT_FIRSTNAME).send_keys(nombre)
-        self.driver.find_element(*self.INPUT_LASTNAME).send_keys(apellido)
-        self.driver.find_element(*self.INPUT_EMAIL).send_keys(email)
-        self.driver.find_element(*self.INPUT_CARDNAME).send_keys(card_name)
-        self.driver.find_element(*self.INPUT_CARDNUMBER).send_keys(card_number)
-        self.driver.find_element(*self.INPUT_CVV).send_keys(cvv)
+        self.fill_field("firstName", nombre)
+        self.fill_field("lastName", apellido)
+        self.fill_field("email", email)
+        self.fill_field("cardName", card_name)
+        self.fill_field("cardNumber", card_number)
+        self.fill_field("cvv", cvv)
 
     def confirm_payment(self):
-        """Hace clic en Confirmar pago"""
-        boton = self.driver.find_element(*self.CONFIRM_BUTTON)
+        """Hace clic en Confirmar pago y espera redirección"""
+        boton = self.wait.until(EC.element_to_be_clickable(self.CONFIRM_BUTTON))
         boton.click()
+        from page_objects.payment_confirmation_page import ConfirmationPage
+        return ConfirmationPage(self.driver)
 
     def get_success_message(self):
         """Devuelve el mensaje de compra exitosa"""
         try:
             return self.wait.until(EC.presence_of_element_located(self.SUCCESS_MESSAGE)).text
-        except:
+        except TimeoutException:
             return None
 
     def get_field_validation_message(self, field_id):
-        """Devuelve el mensaje de validación de un input HTML5"""
+        """Devuelve el mensaje de validación HTML5 que genera el navegador"""
         field = self.driver.find_element(By.ID, field_id)
-        return self.driver.execute_script(
-            "return arguments[0].validationMessage;", field
-        )
+        return field.get_attribute("validationMessage")
 
     def is_confirm_button_enabled(self):
         """Verifica si el botón de confirmar está habilitado"""
-        return self.driver.find_element(*self.CONFIRM_BUTTON).is_enabled()
+        boton = self.wait.until(EC.presence_of_element_located(self.CONFIRM_BUTTON))
+        return boton.is_enabled()
 
     def fill_field(self, field_id, value):
         """Completa un input específico con el valor dado"""
-        field = self.driver.find_element(By.ID, field_id)
+        field = self.wait.until(EC.presence_of_element_located((By.ID, field_id)))
         field.clear()
         field.send_keys(value)
 
