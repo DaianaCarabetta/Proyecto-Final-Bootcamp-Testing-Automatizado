@@ -8,7 +8,7 @@ def pytest_addoption(parser):
     parser.addoption(
         "--headless",
         action="store_true",
-        help="Ejecutar pruebas en modo headless (sin interfaz de usuario)"
+        help="Ejecutar pruebas en modo headless"
     )
 
 @pytest.fixture
