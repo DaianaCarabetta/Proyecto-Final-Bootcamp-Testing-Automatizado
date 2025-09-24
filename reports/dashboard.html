@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airline API Test Dashboard</title>
+    <title>QA Test Dashboard · UI + API</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -21,7 +21,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -40,12 +40,28 @@
         .header p {
             font-size: 1.2em;
             opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
             margin-bottom: 30px;
         }
 
@@ -66,6 +82,7 @@
             margin-bottom: 20px;
             border-bottom: 2px solid #667eea;
             padding-bottom: 10px;
+            font-size: 1.3em;
         }
 
         .summary-card {
@@ -78,42 +95,117 @@
             border-bottom-color: white;
         }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
         .stat {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 15px 0;
-            padding: 10px;
             background: rgba(255,255,255,0.1);
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
         }
 
         .stat-value {
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: bold;
+            display: block;
+            margin-top: 5px;
         }
 
         .passed { color: #4CAF50; }
         .failed { color: #F44336; }
         .warning { color: #FF9800; }
 
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-top: 10px;
+        }
+
         .module-list {
             list-style: none;
         }
 
         .module-list li {
-            padding: 12px;
+            padding: 12px 15px;
             margin: 8px 0;
             background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-left: 4px solid #667eea;
         }
 
-        .chart-container {
-            position: relative;
-            height: 300px;
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .test-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #667eea;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .test-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .test-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-passed { background: #e8f5e8; color: #2e7d32; }
+        .status-failed { background: #ffebee; color: #c62828; }
+        .status-skipped { background: #fff3e0; color: #ef6c00; }
+
+        .type-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .type-api { background: #e3f2fd; color: #1565c0; }
+        .type-ui { background: #f3e5f5; color: #7b1fa2; }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: white;
+            border: 2px solid #667eea;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
         }
 
         .footer {
@@ -127,7 +219,9 @@
             .dashboard {
                 grid-template-columns: 1fr;
             }
-
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
             .header h1 {
                 font-size: 2em;
             }
@@ -137,31 +231,50 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>✈️ Airline API Test Dashboard</h1>
+            <h1>🧪 QA Test Dashboard — UI & API</h1>
             <p>Reporte de ejecución de pruebas automatizadas</p>
+
+            <div class="meta-info">
+                <div class="meta-item">📦 Proyecto: <strong>Airline App</strong></div>
+                <div class="meta-item">🧪 Entorno: <strong>Testing</strong></div>
+                <div class="meta-item">🌿 Branch: <strong>feature/auth-hardening</strong></div>
+                <div class="meta-item">🕒 Fecha: <strong id="current-date">Cargando...</strong></div>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Todos los Tests</button>
+                <button class="filter-btn" data-filter="API">Solo API</button>
+                <button class="filter-btn" data-filter="UI">Solo UI</button>
+                <button class="filter-btn" data-filter="passed">Solo Exitosos</button>
+                <button class="filter-btn" data-filter="failed">Solo Fallidos</button>
+            </div>
         </div>
 
         <div class="dashboard">
+            <!-- Resumen General -->
             <div class="card summary-card">
                 <h2>📊 Resumen General</h2>
-                <div class="stat">
-                    <span>Total de Tests:</span>
-                    <span class="stat-value">21</span>
-                </div>
-                <div class="stat">
-                    <span>Tests Exitosos:</span>
-                    <span class="stat-value passed">20</span>
-                </div>
-                <div class="stat">
-                    <span>Tests Fallidos:</span>
-                    <span class="stat-value failed">1</span>
-                </div>
-                <div class="stat">
-                    <span>Tasa de Éxito:</span>
-                    <span class="stat-value">95.2%</span>
+                <div class="stats-grid">
+                    <div class="stat">
+                        <span>Total Tests</span>
+                        <span class="stat-value" id="total-tests">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>Tests API</span>
+                        <span class="stat-value" id="api-tests">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>Tests UI</span>
+                        <span class="stat-value" id="ui-tests">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>Tasa de Éxito</span>
+                        <span class="stat-value" id="success-rate">0%</span>
+                    </div>
                 </div>
             </div>
 
+            <!-- Gráfico de Distribución -->
             <div class="card">
                 <h2>📈 Distribución de Resultados</h2>
                 <div class="chart-container">
@@ -169,85 +282,254 @@
                 </div>
             </div>
 
+            <!-- Estado por Módulo -->
             <div class="card">
                 <h2>🎯 Estado por Módulo</h2>
-                <ul class="module-list">
-                    <li>
-                        <span>🔐 Authentication</span>
-                        <span class="passed">15/15 ✅</span>
-                    </li>
-                    <li>
-                        <span>🌐 Health Check</span>
-                        <span class="passed">1/1 ✅</span>
-                    </li>
-                    <li>
-                        <span>👥 Users</span>
-                        <span class="warning">4/5 ⚠️</span>
-                    </li>
-                </ul>
+                <div id="module-stats">
+                    <!-- Se llena dinámicamente -->
+                </div>
             </div>
 
+            <!-- Tests Fallidos -->
             <div class="card">
-                <h2>⚠️ Test Fallido</h2>
-                <div class="stat failed">
-                    <span>test_get_all_users</span>
-                    <span class="stat-value">500 Error</span>
+                <h2>⚠️ Tests Fallidos</h2>
+                <div id="failed-tests">
+                    <!-- Se llena dinámicamente -->
                 </div>
-                <p style="margin-top: 15px; color: #666;">
-                    <strong>Endpoint:</strong> GET /users<br>
-                    <strong>Razón:</strong> Internal Server Error<br>
-                    <strong>Impacto:</strong> No se pueden listar usuarios
-                </p>
+            </div>
+
+            <!-- Lista Completa de Tests -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2>📋 Lista Completa de Tests</h2>
+                <div style="overflow-x: auto;">
+                    <table class="test-table" id="all-tests-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Módulo</th>
+                                <th>Nombre del Test</th>
+                                <th>Estado</th>
+                                <th>Duración</th>
+                                <th>Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tests-table-body">
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <div class="footer">
-            <p>🔄 Reporte generado automáticamente - {fecha}</p>
-            <p>🚀 Airline API Testing Suite</p>
+            <p>🔄 Reporte generado automáticamente - <span id="report-date">Cargando...</span></p>
+            <p>🚀 Airline API & UI Testing Suite</p>
         </div>
     </div>
 
     <script>
-        // Actualizar fecha
-        document.querySelector('.footer p').textContent =
-            '🔄 Reporte generado automáticamente - ' + new Date().toLocaleDateString('es-ES');
-
-        // Gráfico de resultados
-        const ctx = document.getElementById('resultsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['✅ Exitosos (20)', '❌ Fallidos (1)'],
-                datasets: [{
-                    data: [20, 1],
-                    backgroundColor: ['#4CAF50', '#F44336'],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
+        // Datos de ejemplo (reemplazar con datos reales del JSON)
+        const testData = {
+            project: "Airline App",
+            environment: "Testing",
+            execution_date: new Date().toISOString(),
+            summary: {
+                total_tests: 21,
+                passed: 20,
+                failed: 1,
+                skipped: 0,
+                success_rate: "95.2%"
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: {
-                                size: 14
-                            },
-                            color: '#333'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.label + ': ' + context.raw + ' tests';
+            test_cases: [
+                // Tests API
+                { type: "API", module: "Authentication", name: "POST /auth/login ok", status: "passed", duration: "220ms" },
+                { type: "API", module: "Authentication", name: "POST /auth/login bad pwd", status: "passed", duration: "180ms" },
+                { type: "API", module: "Authentication", name: "POST /auth/refresh ok", status: "passed", duration: "150ms" },
+                { type: "API", module: "Health Check", name: "GET /health", status: "passed", duration: "60ms" },
+                { type: "API", module: "Users", name: "GET /users ok", status: "passed", duration: "120ms" },
+                { type: "API", module: "Users", name: "GET /users requires auth", status: "passed", duration: "110ms" },
+                { type: "API", module: "Users", name: "GET /users 500", status: "failed", duration: "90ms", error: "Internal Server Error" },
+
+                // Tests UI
+                { type: "UI", module: "Login", name: "Login exitoso redirige a Dashboard", status: "passed", duration: "1500ms" },
+                { type: "UI", module: "Login", name: "Login inválido muestra toast", status: "passed", duration: "1100ms" },
+                { type: "UI", module: "Users", name: "Listado de usuarios se renderiza", status: "passed", duration: "1300ms" },
+                { type: "UI", module: "Users", name: "Filtro por rol funciona", status: "passed", duration: "1400ms" }
+            ]
+        };
+
+        // Función para cargar datos reales desde el JSON
+        async function loadTestData() {
+            try {
+                const response = await fetch('enhanced_test_report.json');
+                const realData = await response.json();
+                return realData;
+            } catch (error) {
+                console.warn('No se pudo cargar el reporte JSON, usando datos de ejemplo');
+                return testData;
+            }
+        }
+
+        // Función principal para renderizar el dashboard
+        async function renderDashboard() {
+            const data = await loadTestData();
+
+            // Actualizar fechas
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES');
+            document.getElementById('report-date').textContent = new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES');
+
+            // Actualizar resumen
+            document.getElementById('total-tests').textContent = data.summary.total_tests;
+            document.getElementById('success-rate').textContent = data.summary.success_rate;
+
+            const apiTests = data.test_cases.filter(test => test.type === 'API').length;
+            const uiTests = data.test_cases.filter(test => test.type === 'UI').length;
+            document.getElementById('api-tests').textContent = apiTests;
+            document.getElementById('ui-tests').textContent = uiTests;
+
+            // Renderizar gráfico
+            renderChart(data);
+
+            // Renderizar módulos
+            renderModuleStats(data);
+
+            // Renderizar tests fallidos
+            renderFailedTests(data);
+
+            // Renderizar tabla completa
+            renderTestsTable(data);
+
+            // Configurar filtros
+            setupFilters(data);
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            const passed = data.test_cases.filter(test => test.status === 'passed').length;
+            const failed = data.test_cases.filter(test => test.status === 'failed').length;
+            const skipped = data.test_cases.filter(test => test.status === 'skipped').length;
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [`✅ Exitosos (${passed})`, `❌ Fallidos (${failed})`, `⚡ Skipped (${skipped})`],
+                    datasets: [{
+                        data: [passed, failed, skipped],
+                        backgroundColor: ['#4CAF50', '#F44336', '#FF9800'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 12 },
+                                color: '#333'
                             }
                         }
                     }
                 }
+            });
+        }
+
+        function renderModuleStats(data) {
+            const modules = {};
+            data.test_cases.forEach(test => {
+                if (!modules[test.module]) {
+                    modules[test.module] = { passed: 0, failed: 0, total: 0 };
+                }
+                modules[test.module].total++;
+                if (test.status === 'passed') modules[test.module].passed++;
+                if (test.status === 'failed') modules[test.module].failed++;
+            });
+
+            const moduleStats = document.getElementById('module-stats');
+            moduleStats.innerHTML = '';
+
+            Object.entries(modules).forEach(([module, stats]) => {
+                const successRate = ((stats.passed / stats.total) * 100).toFixed(1);
+                const moduleEl = document.createElement('div');
+                moduleEl.className = 'module-list';
+                moduleEl.innerHTML = `
+                    <li>
+                        <span>${module}</span>
+                        <span class="${successRate === 100 ? 'passed' : successRate >= 80 ? 'warning' : 'failed'}">
+                            ${stats.passed}/${stats.total} (${successRate}%)
+                        </span>
+                    </li>
+                `;
+                moduleStats.appendChild(moduleEl);
+            });
+        }
+
+        function renderFailedTests(data) {
+            const failedTests = data.test_cases.filter(test => test.status === 'failed');
+            const failedContainer = document.getElementById('failed-tests');
+
+            if (failedTests.length === 0) {
+                failedContainer.innerHTML = '<p style="color: #4CAF50; text-align: center;">✅ No hay tests fallidos</p>';
+                return;
             }
-        });
+
+            failedTests.forEach(test => {
+                const testEl = document.createElement('div');
+                testEl.className = 'failed-test';
+                testEl.innerHTML = `
+                    <div style="background: #ffebee; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <strong>${test.name}</strong><br>
+                        <small>Tipo: ${test.type} | Módulo: ${test.module}</small><br>
+                        ${test.error ? `<span style="color: #c62828;">Error: ${test.error}</span>` : ''}
+                    </div>
+                `;
+                failedContainer.appendChild(testEl);
+            });
+        }
+
+        function renderTestsTable(data, filter = 'all') {
+            const tbody = document.getElementById('tests-table-body');
+            tbody.innerHTML = '';
+
+            let filteredTests = data.test_cases;
+            if (filter !== 'all') {
+                filteredTests = data.test_cases.filter(test =>
+                    filter === 'API' ? test.type === 'API' :
+                    filter === 'UI' ? test.type === 'UI' :
+                    filter === 'passed' ? test.status === 'passed' :
+                    filter === 'failed' ? test.status === 'failed' : true
+                );
+            }
+
+            filteredTests.forEach(test => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="type-badge type-${test.type.toLowerCase()}">${test.type}</span></td>
+                    <td>${test.module}</td>
+                    <td>${test.name}</td>
+                    <td><span class="status-badge status-${test.status}">${test.status}</span></td>
+                    <td>${test.duration}</td>
+                    <td>${test.error ? test.error : '-'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function setupFilters(data) {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderTestsTable(data, btn.dataset.filter);
+                });
+            });
+        }
+
+        // Inicializar el dashboard cuando se carga la página
+        document.addEventListener('DOMContentLoaded', renderDashboard);
     </script>
 </body>
 </html>
