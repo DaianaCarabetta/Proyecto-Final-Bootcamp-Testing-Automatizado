@@ -10,4 +10,3 @@ Feature: Validar que la sección "Horarios" no tiene función asignada en la hom
     When hace scroll en la cartelera
     And hace clic en la palabra "Horarios"
     Then no ocurre ninguna acción ni redirección
-

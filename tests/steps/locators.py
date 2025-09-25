@@ -4,6 +4,16 @@
 NAV_ALIMENTOS_BUTTON_XPATH = '//a[contains(@href, "/alimentos")]'
 NAV_PROMOS_BUTTON_XPATH = '//a[contains(@href, "/promos")]'
 NAV_HOME_LINK_HREF_XPATH = '//a[@href="/"]'
+PELICULA_FANTASTICOS_IMAGE_XPATH = '(//img[@alt="Poster de Los 4 Fantásticos: Primeros Pasos"])[2]'
+PELICULA_SUPERMAN_IMAGE_XPATH = '(//img[@alt="Poster de Superman"])[2]'
+PELICULA_JURASSIC_WORLD_IMAGE_XPATH = '//img[contains(@src, "jurassic-world-poster")]'
+PELICULA_F1_IMAGE_XPATH = '//img[contains(@src, "f1-poster")]'
+PELICULA_TOY_STORY_IMAGE_XPATH = '//img[contains(@src, "toy-story-poster")]'
+PELICULA_EL_PADRINO_IMAGE_XPATH = '//img[contains(@src, "the-godfather-poster")]'
+PELICULA_DARK_KNIGHT_IMAGE_XPATH = '//img[contains(@src, "the-dark-knight-poster")]'
+PELICULA_CHIHIRO_IMAGE_XPATH = '//img[contains(@src, "spirited-away-poster")]'
+PELICULA_EL_ORIGEN_IMAGE_XPATH = '//img[contains(@src, "inception-poster")]'
+PELICULA_PARASITOS_IMAGE_XPATH = '//img[contains(@src, "parasite-poster")]'
 
 # 🔹 Sección Alimentos
 PALOMITAS_IMAGE_XPATH = '//img[@alt="Palomitas"]'
@@ -32,3 +42,6 @@ PRECIO_ESTUDIANTES_IMAGE_XPATH = '//img[@alt="Precio Estudiantes"]'
 COMBO_AMIGOS_IMAGE_XPATH = '//img[@alt="Combo Amigos"]'
 PALOMITAS_REFILL_IMAGE_XPATH = '//img[@alt="Palomitas Refill"]'
 BEBIDA_GRANDE_GRATIS_IMAGE_XPATH = '//img[@alt="Bebida Grande Gratis"]'
+
+# Seccion Carrito
+SHOW_CART_LINK_XPATH = '//a[text()="Carrito" and @href="/cart"]'

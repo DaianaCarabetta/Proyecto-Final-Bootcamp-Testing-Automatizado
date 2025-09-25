@@ -7,5 +7,5 @@ Feature: Añadir múltiples unidades al carrito
     Given que el usuario está en la sección de alimentos
 
   Scenario: Corroborar que la cantidad de palomitas aumenta en el carrito al hacer clic varias veces
-    When hago clic 3 veces en el botón "Agregar" para las "Palomitas de Maíz"
-    Then la cantidad de "Palomitas de Maíz" en el carrito es 3
+    When hago clic 3 veces en el botón "Agregar" para las "Palomitas"
+    Then la cantidad de "Palomitas" en el carrito es 3
