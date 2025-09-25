@@ -1,32 +1,54 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
 from behave import given, when, then
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+import time
 
-BASE_URL = 'https://fake-cinema.vercel.app/'
+from locators import SHOW_CART_LINK_XPATH
+from locators import PALOMITAS_IMAGE_XPATH, ADD_TO_CART_BUTTON_XPATH
+from config_browser import iniciar_navegador, base_url
 
 @given('que el usuario está en la sección de alimentos')
-def step_impl(context):
-    context.driver = webdriver.Chrome()
-    context.driver.get(BASE_URL)
-    wait = WebDriverWait(context.driver, 10)
-    alimentos_button = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, 'Alimentos')))
-    alimentos_button.click()
+def step_ir_a_seccion_alimentos(context):
+    context.driver = iniciar_navegador()
+    context.base_url = base_url
+    context.driver.get(f"{context.base_url}/alimentos")
+    context.wait = WebDriverWait(context.driver, 10)
 
-@when('hago clic 3 veces en el botón "Agregar" para las "Palomitas de Maíz"')
-def step_impl(context):
-    wait = WebDriverWait(context.driver, 10)
-    agregar_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Agregar al carrito']")))
+@when('hago clic 3 veces en el botón "Agregar" para las "Palomitas"')
+def step_agregar_palomitas(context):
+    WebDriverWait(context.driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, PALOMITAS_IMAGE_XPATH))
+    ).click()
+
+    boton_agregar = WebDriverWait(context.driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, ADD_TO_CART_BUTTON_XPATH))
+    )
+
     for _ in range(3):
-        agregar_button.click()
+        boton_agregar.click()
+        time.sleep(0.5)
 
-@then('la cantidad de "Palomitas de Maíz" en el carrito es 3')
-def step_impl(context):
-    wait = WebDriverWait(context.driver, 10)
-    carrito_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='/cart']")))
-    carrito_button.click()
-    cantidad_palomitas = wait.until(EC.presence_of_element_located((By.XPATH, "//span[normalize-space()='Palomitas x 3']")))
-    assert cantidad_palomitas.text == '3', f"Se esperaba 3 pero se obtuvo {cantidad_palomitas.text}"
-    context.driver.quit()
+@then('la cantidad de "Palomitas" en el carrito es 3')
+def step_verificar_palomitas_en_carrito(context):
+    # Abrir el carrito
+    WebDriverWait(context.driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, SHOW_CART_LINK_XPATH))
+    ).click()
 
+    # Verificar el contenido del carrito
+    xpath_cantidad = f'//span[contains(normalize-space(.), "Palomitas x 3")]'
+
+    try:
+        elemento = WebDriverWait(context.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, xpath_cantidad))
+        )
+        assert "Palomitas x 3" in elemento.text
+
+    finally:
+        context.driver.quit()
