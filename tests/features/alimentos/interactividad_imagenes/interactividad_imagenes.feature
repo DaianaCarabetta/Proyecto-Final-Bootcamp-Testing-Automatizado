@@ -7,5 +7,5 @@ Feature: Indicador de interactividad para imágenes
     Given que el usuario está en la sección de alimentos
 
   Scenario: Comprobar que el cursor cambia a mano sobre las imágenes de los alimentos
-    When mueve el cursor sobre la imagen de unas palomitas
+    When mueve el cursor sobre la imagen de las palomitas
     Then el cursor cambia de una flecha a una mano

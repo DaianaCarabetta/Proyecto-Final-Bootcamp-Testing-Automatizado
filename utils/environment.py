@@ -6,6 +6,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 def before_all(context):
+
     context.base_url = "https://fake-cinema.vercel.app"
 
 def before_scenario(context, scenario):
@@ -16,4 +17,5 @@ def before_scenario(context, scenario):
     context.driver.set_window_size(1280, 800)
 
 def after_scenario(context, scenario):
+
     context.driver.quit()
