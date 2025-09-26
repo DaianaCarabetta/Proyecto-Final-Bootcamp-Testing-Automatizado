@@ -11,6 +11,7 @@ Feature: Carrito de compras
     And selecciona "Hot Dog"
     And hace clic en "Agregar al carrito"
     And accede a la vista de Carrito
+    Then debería visualizar la vista de Carrito cargada correctamente
 
   Scenario: Ver items del carrito
     Then debería ver "Palomitas" con su precio "$3.50"
@@ -23,4 +24,3 @@ Feature: Carrito de compras
   Scenario: Proceder al pago desde el carrito
     When hace clic en "Proceder al pago"
     Then el sistema debería redirigirlo a la vista de checkout
-

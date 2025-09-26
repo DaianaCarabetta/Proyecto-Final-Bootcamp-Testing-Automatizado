@@ -5,9 +5,11 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
 def before_all(context):
+    print(">>> before_all ejecutado")
     context.base_url = "https://fake-cinema.vercel.app"
 
 def before_scenario(context, scenario):
+    print(f">>> before_scenario ejecutado para: {scenario.name}")
     opts = Options()
     # opts.add_argument("--headless=new")  # descomenta si quieres sin UI
     context.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
@@ -15,4 +17,5 @@ def before_scenario(context, scenario):
     context.driver.set_window_size(1280, 800)
 
 def after_scenario(context, scenario):
+    print(f">>> after_scenario ejecutado para: {scenario.name}")
     context.driver.quit()
