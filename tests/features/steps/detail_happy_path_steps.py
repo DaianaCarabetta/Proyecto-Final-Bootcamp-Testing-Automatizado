@@ -31,3 +31,4 @@ def step_impl(context):
 def step_impl(context):
     assert context.detail_page.is_book_page_loaded(context.movie_name), \
         "No se redirigió a la página de selección de asientos"
+
