@@ -15,8 +15,8 @@ Feature: Confirmación de pago
     And el usuario completó el formulario de checkout con datos válidos y confirmó el pago
 
   Scenario: Visualizar resumen de compra en confirmación
-    When se muestra la vista de confirmación de pago
-    Then debería visualizar un resumen de la compra con los productos adquiridos y el detalle
+    Then se muestra la vista de confirmación de pago
+    And debería visualizar un resumen de la compra con los productos adquiridos y el detalle
     And debería visualizar el monto total de la compra
     And debería visualizar un número de compra único
 

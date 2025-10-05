@@ -9,7 +9,7 @@ def step_impl(context):
     assert context.page.is_loaded(), "La página de confirmación no se cargó correctamente."
 
 
-@when("se muestra la vista de confirmación de pago")
+@then("se muestra la vista de confirmación de pago")
 def step_impl(context):
     context.page = ConfirmationPage(context.driver)
     assert context.page.is_loaded(), "La vista de confirmación no está disponible."
