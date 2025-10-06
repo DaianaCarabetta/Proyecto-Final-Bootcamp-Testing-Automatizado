@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
@@ -11,6 +12,7 @@ from webdriver_manager.microsoft import EdgeChromiumDriverManager
 import os
 import sys
 import datetime
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 
@@ -19,25 +21,32 @@ def _create_driver():
     browser = os.getenv("BROWSER", "chrome").lower()
     print(f">>> Iniciando pruebas en navegador: {browser}")
 
-    if browser == "chrome":
-        opts = ChromeOptions()
-        # opts.add_argument("--headless=new")  # descomentar si querés modo headless
-        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=opts)
+    try:
+        if browser == "chrome":
+            opts = ChromeOptions()
+            # opts.add_argument("--headless=new")
+            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=opts)
 
-    elif browser == "firefox":
-        opts = FirefoxOptions()
-        # opts.add_argument("--headless")
-        driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=opts)
+        elif browser == "firefox":
+            opts = FirefoxOptions()
+            # opts.add_argument("--headless")
+            driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=opts)
 
-    elif browser == "edge":
-        opts = EdgeOptions()
-        # opts.add_argument("--headless")
-        driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=opts)
+        elif browser == "edge":
+            opts = EdgeOptions()
+            # opts.add_argument("--headless")
+            driver = webdriver.Edge(
+                service=EdgeService(EdgeChromiumDriverManager().install()),
+                options=opts
+            )
+        else:
+            raise ValueError(f"Navegador no soportado: {browser}")
 
-    else:
-        raise ValueError(f"Navegador no soportado: {browser}")
-
-    return driver
+        return driver
+    except Exception as e:
+        print(f"[!] Error al crear el driver para {browser}: {e}")
+        print("[!] Intentá verificar conexión a Internet o driver local.")
+        raise
 
 
 def before_all(context):
@@ -80,20 +89,37 @@ def before_scenario(context, scenario):
 
 def after_scenario(context, scenario):
     print(f">>> after_scenario ejecutado para: {scenario.name}")
-    if scenario.status == "failed":
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        screenshot_path = f"screenshots/{scenario.name.replace(' ', '_')}_{timestamp}.png"
-        context.driver.save_screenshot(screenshot_path)
-        print(f"[!] Captura guardada en: {screenshot_path}")
 
-    if not getattr(context, "reuse_driver", False):
-        context.driver.quit()
+    # Intentar tomar screenshot solo si el driver existe y sigue vivo
+    if hasattr(context, "driver") and context.driver:
+        if scenario.status == "failed":
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            screenshot_path = f"screenshots/{scenario.name.replace(' ', '_')}_{timestamp}.png"
+            try:
+                context.driver.save_screenshot(screenshot_path)
+                print(f"[!] Captura guardada en: {screenshot_path}")
+            except Exception as e:
+                print(f"⚠️ No se pudo tomar screenshot: {e}")
+
+    # Cerrar driver solo si no estamos reusándolo y sigue activo
+    try:
+        if not getattr(context, "reuse_driver", False):
+            if hasattr(context, "driver") and context.driver:
+                context.driver.quit()
+    except Exception as e:
+        print(f"⚠️ Error cerrando driver: {e}")
+
+
 
 
 def after_feature(context, feature):
     if getattr(context, "reuse_driver", False):
         print(f">>> after_feature ejecutado para {feature.name} [E2E MODE]")
-        context.driver.quit()
+        try:
+            if hasattr(context, "driver") and context.driver:
+                context.driver.quit()
+        except WebDriverException:
+            print("⚠️ Driver ya estaba cerrado")
 
 
 def after_all(context):
