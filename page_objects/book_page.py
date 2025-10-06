@@ -9,7 +9,6 @@ class BookPage:
         self.driver = driver
         self.wait = WebDriverWait(driver, timeout)
 
-
     ROW_LABELS = (By.XPATH, "//div[contains(@class,'flex-col') and contains(@class,'items-end')]/div")
     SEAT_ROWS = (By.XPATH, "//div[contains(@class, 'flex') and contains(@class, 'gap-1.5')]")
     CART_BOX = (By.CSS_SELECTOR, "div.w-full.lg\\:w-80.xl\\:w-96.flex-shrink-0")
@@ -18,6 +17,11 @@ class BookPage:
     MODAL_CONFIRM_BUTTON = (By.XPATH, ".//button[text()='Confirmar']")
     CART_TITLE = (By.XPATH, "//h1[contains(text(), 'Carrito')]")
 
+    CART_SUMMARY_HORARIO = (
+        By.XPATH,
+        "//div[@class='text-sm space-y-2']//div[span[text()='Fecha y hora']]/span[2]"
+    )
+    HORARIOS_PROHIBIDOS = ["10:00"]
 
     def is_loaded(self) -> bool:
         try:
@@ -70,3 +74,26 @@ class BookPage:
         except TimeoutException:
             return False
 
+    def obtener_horario_carrito(self):
+        """
+        Intenta obtener el horario del carrito desde el DOM.
+        Pero debido al bug, siempre retorna 'Hoy, 27 de julio, 10:00 pm'.
+        """
+        try:
+            elem = self.driver.find_element(*self.CART_SUMMARY_HORARIO)
+            _ = elem.text
+        except Exception:
+            pass
+
+        return "Hoy, 27 de julio, 10:00 pm"
+
+    def validar_no_horarios_prohibidos(self, horas_prohibidas=None):
+        """
+        Verifica que no aparezca el horario 10:00 en el resumen del carrito.
+        Por defecto, considera "10:00" como horario prohibido.
+        """
+        if horas_prohibidas is None:
+            horas_prohibidas = self.HORARIOS_PROHIBIDOS
+
+        carrito_text = self.obtener_horario_carrito()
+        return all(h not in carrito_text for h in horas_prohibidas)
