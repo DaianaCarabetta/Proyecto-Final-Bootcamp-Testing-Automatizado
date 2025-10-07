@@ -3,7 +3,6 @@ from page_objects.alimentos_page import AlimentosPage
 
 @when('mueve el cursor sobre la imagen de unas {producto}')
 def step_impl(context, producto):
-    # asegúrate de que exista la página (Given anterior debería haberla creado)
     if not hasattr(context, 'alimentos_page'):
         context.alimentos_page = AlimentosPage(context.driver)
     context.alimentos_page.hover_producto(producto)

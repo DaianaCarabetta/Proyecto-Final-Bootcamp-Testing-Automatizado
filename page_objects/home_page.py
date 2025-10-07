@@ -21,6 +21,11 @@ class HomePage:
     MOVIE_TITLES = (By.CSS_SELECTOR, "section.container h3.font-bold")
     MOVIE_DETAIL_HEADER = (By.CSS_SELECTOR, "header h1.text-3xl.font-bold")
 
+    H2_CARTELERA = (By.XPATH, "//h2[normalize-space()='Cartelera']")
+    H2_HORARIOS = (By.XPATH, "//h2[normalize-space()='Horarios']")
+    HORARIOS_LINK = (By.LINK_TEXT, "Horarios")
+    HORARIOS_SECTION = (By.XPATH, "//h2[normalize-space()='Horarios']")
+
     def open(self):
         self.driver.get(self.URL)
 
@@ -75,9 +80,7 @@ class HomePage:
     def scroll_to_cartelera(self):
         """Hace scroll hasta el título 'Cartelera'"""
         try:
-            cartelera_header = self.wait.until(
-                EC.presence_of_element_located((By.XPATH, "//h2[text()='Cartelera']"))
-            )
+            cartelera_header = self.wait.until(EC.presence_of_element_located(self.H2_CARTELERA))
             self.driver.execute_script(
                 "arguments[0].scrollIntoView({behavior:'smooth', block:'start'});",
                 cartelera_header
@@ -86,17 +89,17 @@ class HomePage:
             raise Exception("No se encontró la sección de cartelera")
 
     def select_movie(self, movie_name):
-        """
-        Selecciona la película por nombre en la grid de la cartelera
-        y hace click en 'Ver detalle'.
-        """
+        """Selecciona la película por nombre en la cartelera y hace click en 'Ver detalle'."""
         self.wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.grid > div")))
         movie_card_xpath = f"//h3[normalize-space(text())='{movie_name}']/.."
 
         try:
             movie_card = self.wait.until(EC.visibility_of_element_located((By.XPATH, movie_card_xpath)))
             detail_link = movie_card.find_element(By.XPATH, ".//a[contains(text(),'Ver detalle')]")
-            self.driver.execute_script("arguments[0].scrollIntoView({behavior:'smooth', block:'center'});", detail_link)
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView({behavior:'smooth', block:'center'});",
+                detail_link
+            )
             self.wait.until(EC.element_to_be_clickable(detail_link))
             detail_link.click()
         except TimeoutException:
@@ -116,3 +119,20 @@ class HomePage:
         slug = movie_name.lower().replace(" ", "-")
         return f"https://fake-cinema.vercel.app/movies/{slug}"
 
+    # horarios
+    def click_horarios_link(self):
+        """Hace clic en el enlace o botón 'Horarios'."""
+        try:
+            link = self.wait.until(EC.element_to_be_clickable(self.HORARIOS_LINK))
+            self.driver.execute_script("arguments[0].scrollIntoView({behavior:'smooth', block:'center'});", link)
+            link.click()
+        except TimeoutException:
+            raise AssertionError("❌ No se encontró el enlace 'Horarios' para hacer clic")
+
+    def is_horarios_section_visible(self) -> bool:
+        """Verifica que la sección de horarios esté visible."""
+        try:
+            section = self.wait.until(EC.visibility_of_element_located(self.HORARIOS_SECTION))
+            return section.is_displayed()
+        except TimeoutException:
+            return False

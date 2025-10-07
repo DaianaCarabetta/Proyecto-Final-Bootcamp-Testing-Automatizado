@@ -32,18 +32,36 @@ class DetailPage:
         days = self.wait.until(EC.presence_of_all_elements_located(self.SHOWTIME_DAYS))
         if len(days) < 2:
             raise Exception("No hay suficientes días de funciones disponibles")
+
         days[1].click()
         self.selected_day_index = 1
 
-    def get_selected_day_text(self):
-        """Devuelve texto del día seleccionado en formato '6 de oct'"""
-        days = self.wait.until(EC.presence_of_all_elements_located(self.SHOWTIME_DAYS))
-        index = getattr(self, "selected_day_index", 0)  # Default: primer día
-        day_button = days[index]
+        # Espera explícita a que el número del día esté visible usando el driver
+        self.wait.until(
+            EC.presence_of_element_located((
+                By.XPATH,
+                f"(//main//div[contains(@class,'flex')]/button)[2]//div[contains(@class,'text-2xl')]"
+            ))
+        )
 
-        number = day_button.find_element(By.CSS_SELECTOR, "div.text-2xl.font-bold").text.strip()
-        spans = day_button.find_elements(By.TAG_NAME, "span")
-        month = spans[1].text.strip() if len(spans) > 1 else ""
+    def get_selected_day_text(self):
+        index = getattr(self, "selected_day_index", 0)
+
+        # Localiza el número y mes directamente desde el driver
+        number_div = self.wait.until(
+            EC.presence_of_element_located((
+                By.XPATH,
+                f"(//main//div[contains(@class,'flex')]/button)[{index + 1}]//div[contains(@class,'text-2xl')]"
+            ))
+        )
+        number = number_div.text.strip()
+
+        span_elements = self.driver.find_elements(
+            By.XPATH,
+            f"(//main//div[contains(@class,'flex')]/button)[{index + 1}]/span"
+        )
+        month = span_elements[1].text.strip() if len(span_elements) > 1 else ""
+
         return f"{number} de {month}"
 
     def get_languages(self):
