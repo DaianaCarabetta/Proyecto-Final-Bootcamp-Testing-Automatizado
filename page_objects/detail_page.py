@@ -36,7 +36,6 @@ class DetailPage:
         days[1].click()
         self.selected_day_index = 1
 
-        # Espera explícita a que el número del día esté visible usando el driver
         self.wait.until(
             EC.presence_of_element_located((
                 By.XPATH,
@@ -46,8 +45,6 @@ class DetailPage:
 
     def get_selected_day_text(self):
         index = getattr(self, "selected_day_index", 0)
-
-        # Localiza el número y mes directamente desde el driver
         number_div = self.wait.until(
             EC.presence_of_element_located((
                 By.XPATH,
@@ -55,13 +52,11 @@ class DetailPage:
             ))
         )
         number = number_div.text.strip()
-
         span_elements = self.driver.find_elements(
             By.XPATH,
             f"(//main//div[contains(@class,'flex')]/button)[{index + 1}]/span"
         )
         month = span_elements[1].text.strip() if len(span_elements) > 1 else ""
-
         return f"{number} de {month}"
 
     def get_languages(self):
