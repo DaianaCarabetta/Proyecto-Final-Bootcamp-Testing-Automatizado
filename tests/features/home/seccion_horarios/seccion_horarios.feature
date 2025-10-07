@@ -1,7 +1,9 @@
-Feature: Validar que la sección "Horarios" no tiene función asignada en la homepage
+Feature: Validar la sección "Horarios"
 
-  Scenario: Comprobar en la homepage que la sección "Horarios" no tiene asignada ninguna función
-    Given que el usuario se encuentra en la página de inicio
-    When hace scroll en la cartelera
+  Background:
+    Given que el usuario está en la página de inicio
+    When el usuario navega a la sección de cartelera
+
+  Scenario: Comprobar funcionalidad de la sección "Horarios"
     And hace clic en la palabra "Horarios"
-    Then no ocurre ninguna acción ni redirección
+    Then deberia mostrar la seccion de horarios
