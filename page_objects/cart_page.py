@@ -8,7 +8,6 @@ class CartPage:
         self.driver = driver
         self.timeout = timeout
 
-        # ---------- Locators positivos ----------
         self.item_locator = "//h3[text()='{name}']"
         self.add_to_cart_button = "//button[contains(., 'Agregar al carrito')]"
         self.back_to_alimentos_link = "//a[contains(., 'Alimentos')]"
@@ -18,7 +17,6 @@ class CartPage:
         self.total_locator = "//div[.//span[normalize-space()='Total']]/span[2]"
         self.cart_header = "//h1[normalize-space()='Carrito']"
 
-        # ---------- Locators negativos (no existen en la app, se prueban como BUGs) ----------
         self.cart_items = "//div[contains(@class,'flex') and .//span]"
         self.remove_button = "//button[contains(., 'Eliminar')]"
         self.increase_button = "//button[contains(., '+')]"

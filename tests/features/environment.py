@@ -90,7 +90,6 @@ def before_scenario(context, scenario):
 def after_scenario(context, scenario):
     print(f">>> after_scenario ejecutado para: {scenario.name}")
 
-    # Intentar tomar screenshot solo si el driver existe y sigue vivo
     if hasattr(context, "driver") and context.driver:
         if scenario.status == "failed":
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -101,15 +100,12 @@ def after_scenario(context, scenario):
             except Exception as e:
                 print(f"⚠️ No se pudo tomar screenshot: {e}")
 
-    # Cerrar driver solo si no estamos reusándolo y sigue activo
     try:
         if not getattr(context, "reuse_driver", False):
             if hasattr(context, "driver") and context.driver:
                 context.driver.quit()
     except Exception as e:
         print(f"⚠️ Error cerrando driver: {e}")
-
-
 
 
 def after_feature(context, feature):
