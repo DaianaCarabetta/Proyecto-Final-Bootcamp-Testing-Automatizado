@@ -30,4 +30,3 @@ pytest-bdd==8.1.0
 pytest-html==4.0.2
 pytest-cov==7.0.0
 pipenv==2024.4.1
-
