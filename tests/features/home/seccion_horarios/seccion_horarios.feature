@@ -1,3 +1,4 @@
+@bug
 Feature: Validar la sección "Horarios"
 
   Background:
