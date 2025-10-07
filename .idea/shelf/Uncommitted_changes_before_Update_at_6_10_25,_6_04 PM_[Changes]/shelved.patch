@@ -1,0 +1,12 @@
+Index: behave.ini
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/behave.ini b/behave.ini
+new file mode 100644
+--- /dev/null	(date 1758674802298)
++++ b/behave.ini	(date 1758674802298)
+@@ -0,0 +1,2 @@
++[behave]
++paths = tests/features
